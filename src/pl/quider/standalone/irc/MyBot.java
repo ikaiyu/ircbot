@@ -58,6 +58,7 @@ public class MyBot extends PircBot {
         super.onMessage(channel, sender, login, hostname, message);
         UserService userService = new UserService(sender,login,hostname, session);
         pl.quider.standalone.irc.model.User user = userService.getUser();
+        userService.userPresent(user);
         Message msg = new Message(channel, sender, user, message);
         MessageService messageService = new MessageService(msg,this, this.session);
         messageService.executeCommand();
@@ -81,8 +82,8 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onJoin(String channel, String sender, String login, String hostname) {
-        super.onJoin(channel, sender, login, hostname);
-
+        UserService userService = new UserService(sender, login, hostname, this.session);
+        userService.joined(channel);
     }
 
     @Override
