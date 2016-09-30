@@ -61,7 +61,7 @@ public class MyBot extends PircBot {
         userService.userPresent(user);
         Message msg = new Message(channel, sender, user, message);
         MessageService messageService = new MessageService(msg,this, this.session);
-        messageService.executeCommand();
+        messageService.executeCommand(this);
 
     }
 
@@ -84,6 +84,10 @@ public class MyBot extends PircBot {
     protected void onJoin(String channel, String sender, String login, String hostname) {
         UserService userService = new UserService(sender, login, hostname, this.session);
         userService.joined(channel);
+        pl.quider.standalone.irc.model.User user = userService.getUser();
+        if(user.isOp()){
+            
+        }
     }
 
     @Override
