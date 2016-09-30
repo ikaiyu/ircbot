@@ -75,21 +75,31 @@ public class UserService {
         return user!=null;
     }
 
+    /**
+     * Gets nick which was given in constructor
+     */
     public String getNick() {
         return nick;
     }
 
+    /**
+     * Gets login whcih was given in constructor
+     */
     public String getLogin() {
         return login;
     }
 
+    /**
+     * Gets host whcih was given in constructor
+     */
     public String getHost() {
         return host;
     }
 
     /**
-     *
-     * @param channel
+     * Actions which supposed to be performed when someone joins to channel
+     * like set presence
+     * @param channel String channel name i.e: #channel
      */
     public void joined(String channel) {
         User user = this.getUser();
@@ -97,7 +107,7 @@ public class UserService {
     }
 
     /**
-     *
+     * Sets latest presence of user 
      * @param user
      */
     public void userPresent(User user) {
