@@ -32,11 +32,13 @@ public class MessageService {
     public void executeCommand(final MyBot bot) {
         this.saveMessage();
         if (isUserCallingMe()) {
+            if (!msg.getUser().getLogin().equals("quider"))
+                return;
             try {
-                Pattern pattern = Pattern.compile("^((!bot) ([a-z]+) (.+))$");
-                Matcher matcher = pattern.matcher(msg.getMessage());
-                String verb = matcher.group(3);
-                String parameter = matcher.group(4);
+                String[] split = msg.getMessage().split(" ");
+                String verb = split[1];
+                String parameter = split[2];
+
                 verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
                 Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
 
@@ -60,9 +62,10 @@ public class MessageService {
 
     private void saveMessage() {
         try {
-            Transaction transaction = session.beginTransaction();
             session.save(msg);
-            transaction.commit();
+            Transaction transaction = session.getTransaction();
+            if(transaction.isActive())
+                transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }

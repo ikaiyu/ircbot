@@ -2,7 +2,6 @@ package pl.quider.standalone.irc.services;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.query.Query;
 import pl.quider.standalone.irc.model.User;
 
@@ -29,7 +28,7 @@ public class UserService {
         this.session=session;
     }
 
-    /**
+     /**
      *
      * @return
      */
@@ -49,10 +48,13 @@ public class UserService {
      */
     private void createNewUser() {
         try {
-            User user = new User();
-            user.setNick(getNick());
+            user = new User();
+            user.setNickName(getNick());
+            user.setLogin(getLogin());
             user.setMask(getHost());
-            Transaction transaction = session.beginTransaction();
+            Transaction transaction = session.getTransaction();
+            if(!transaction.isActive())
+                transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
         } catch (Exception e) {
@@ -112,7 +114,9 @@ public class UserService {
      */
     public void userPresent(User user) {
         try {
-            Transaction transaction = session.beginTransaction();
+            Transaction transaction = session.getTransaction();
+            if(!transaction.isActive())
+                transaction= session.beginTransaction();
             user.setLastSeen(new Date());
             session.save(user);
             transaction.commit();

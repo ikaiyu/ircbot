@@ -14,8 +14,8 @@ public class User implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name="login")
-    private String nick;
+    @Column(name="nick")
+    private String nickName;
     @Column(name = "isOp")
     private boolean isOp;
     @Column(name="mask")
@@ -33,12 +33,12 @@ public class User implements Serializable{
         this.id = id;
     }
 
-    public String getNick() {
-        return nick;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setNick(String login) {
-        this.nick = login;
+    public void setNickName(String login) {
+        this.nickName = login;
     }
 
     public boolean isOp() {

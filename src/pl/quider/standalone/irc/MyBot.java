@@ -1,6 +1,7 @@
 package pl.quider.standalone.irc;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.jibble.pircbot.DccChat;
 import org.jibble.pircbot.DccFileTransfer;
 import org.jibble.pircbot.PircBot;
@@ -9,6 +10,8 @@ import pl.quider.standalone.irc.dbsession.ADatabaseSession;
 import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.services.MessageService;
 import pl.quider.standalone.irc.services.UserService;
+import pl.quider.standalone.irc.verbs.Op;
+import pl.quider.standalone.irc.verbs.Verb;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -20,6 +23,7 @@ public class MyBot extends PircBot {
 
     boolean isOp;
     private Session session;
+    private Verb verb;
 
 
     public MyBot(ADatabaseSession session) {
@@ -45,7 +49,14 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onServerResponse(int code, String response) {
-        super.onServerResponse(code, response);
+        switch (code){
+            case 311 :
+                if(this.verb != null) {
+                    this.verb.execute(response);
+                    this.verb = null;
+                }
+                break;
+        }
     }
 
     @Override
@@ -55,6 +66,9 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onMessage(String channel, String sender, String login, String hostname, String message) {
+        Transaction transaction = session.getTransaction();
+        if(!transaction.isActive())
+            transaction = session.beginTransaction();
         super.onMessage(channel, sender, login, hostname, message);
         UserService userService = new UserService(sender,login,hostname, session);
         pl.quider.standalone.irc.model.User user = userService.getUser();
@@ -62,7 +76,7 @@ public class MyBot extends PircBot {
         Message msg = new Message(channel, sender, user, message);
         MessageService messageService = new MessageService(msg,this, this.session);
         messageService.executeCommand(this);
-
+        transaction.commit();
     }
 
     @Override
@@ -86,7 +100,7 @@ public class MyBot extends PircBot {
         userService.joined(channel);
         pl.quider.standalone.irc.model.User user = userService.getUser();
         if(user.isOp()){
-            
+            this.op(channel, user.getNickName());
         }
     }
 
@@ -137,172 +151,13 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onOp(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient) {
-        super.onOp(channel, sourceNick, sourceLogin, sourceHostname, recipient);
+        this.verb = new Op(this);
+        sendRawLine("WHOIS "+recipient);
     }
 
     @Override
     protected void onDeop(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient) {
         super.onDeop(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-    }
-
-    @Override
-    protected void onVoice(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient) {
-        super.onVoice(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-    }
-
-    @Override
-    protected void onDeVoice(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient) {
-        super.onDeVoice(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-    }
-
-    @Override
-    protected void onSetChannelKey(String channel, String sourceNick, String sourceLogin, String sourceHostname, String key) {
-        super.onSetChannelKey(channel, sourceNick, sourceLogin, sourceHostname, key);
-    }
-
-    @Override
-    protected void onRemoveChannelKey(String channel, String sourceNick, String sourceLogin, String sourceHostname, String key) {
-        super.onRemoveChannelKey(channel, sourceNick, sourceLogin, sourceHostname, key);
-    }
-
-    @Override
-    protected void onSetChannelLimit(String channel, String sourceNick, String sourceLogin, String sourceHostname, int limit) {
-        super.onSetChannelLimit(channel, sourceNick, sourceLogin, sourceHostname, limit);
-    }
-
-    @Override
-    protected void onRemoveChannelLimit(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveChannelLimit(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetChannelBan(String channel, String sourceNick, String sourceLogin, String sourceHostname, String hostmask) {
-        super.onSetChannelBan(channel, sourceNick, sourceLogin, sourceHostname, hostmask);
-    }
-
-    @Override
-    protected void onRemoveChannelBan(String channel, String sourceNick, String sourceLogin, String sourceHostname, String hostmask) {
-        super.onRemoveChannelBan(channel, sourceNick, sourceLogin, sourceHostname, hostmask);
-    }
-
-    @Override
-    protected void onSetTopicProtection(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetTopicProtection(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemoveTopicProtection(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveTopicProtection(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetNoExternalMessages(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetNoExternalMessages(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemoveNoExternalMessages(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveNoExternalMessages(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetInviteOnly(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetInviteOnly(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemoveInviteOnly(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveInviteOnly(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetModerated(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetModerated(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemoveModerated(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveModerated(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetPrivate(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetPrivate(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemovePrivate(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemovePrivate(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onSetSecret(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onSetSecret(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onRemoveSecret(String channel, String sourceNick, String sourceLogin, String sourceHostname) {
-        super.onRemoveSecret(channel, sourceNick, sourceLogin, sourceHostname);
-    }
-
-    @Override
-    protected void onInvite(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String channel) {
-        super.onInvite(targetNick, sourceNick, sourceLogin, sourceHostname, channel);
-    }
-
-    @Override
-    protected void onDccSendRequest(String sourceNick, String sourceLogin, String sourceHostname, String filename, long address, int port, int size) {
-        super.onDccSendRequest(sourceNick, sourceLogin, sourceHostname, filename, address, port, size);
-    }
-
-    @Override
-    protected void onDccChatRequest(String sourceNick, String sourceLogin, String sourceHostname, long address, int port) {
-        super.onDccChatRequest(sourceNick, sourceLogin, sourceHostname, address, port);
-    }
-
-    @Override
-    protected void onIncomingFileTransfer(DccFileTransfer transfer) {
-        super.onIncomingFileTransfer(transfer);
-    }
-
-    @Override
-    protected void onFileTransferFinished(DccFileTransfer transfer, Exception e) {
-        super.onFileTransferFinished(transfer, e);
-    }
-
-    @Override
-    protected void onIncomingChatRequest(DccChat chat) {
-        super.onIncomingChatRequest(chat);
-    }
-
-    @Override
-    protected void onVersion(String sourceNick, String sourceLogin, String sourceHostname, String target) {
-        super.onVersion(sourceNick, sourceLogin, sourceHostname, target);
-    }
-
-    @Override
-    protected void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue) {
-        super.onPing(sourceNick, sourceLogin, sourceHostname, target, pingValue);
-    }
-
-    @Override
-    protected void onServerPing(String response) {
-        super.onServerPing(response);
-    }
-
-    @Override
-    protected void onTime(String sourceNick, String sourceLogin, String sourceHostname, String target) {
-        super.onTime(sourceNick, sourceLogin, sourceHostname, target);
-    }
-
-    @Override
-    protected void onFinger(String sourceNick, String sourceLogin, String sourceHostname, String target) {
-        super.onFinger(sourceNick, sourceLogin, sourceHostname, target);
-    }
-
-    @Override
-    protected void onUnknown(String line) {
-        super.onUnknown(line);
     }
 
     @Override
@@ -353,5 +208,9 @@ public class MyBot extends PircBot {
     @Override
     public void setDccPorts(int[] ports) {
         super.setDccPorts(ports);
+    }
+
+    public Session getSession() {
+        return session;
     }
 }
