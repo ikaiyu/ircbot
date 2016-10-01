@@ -49,9 +49,9 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onServerResponse(int code, String response) {
-        switch (code){
-            case 311 :
-                if(this.verb != null) {
+        switch (code) {
+            case 311:
+                if (this.verb != null) {
                     this.verb.execute(response);
                     this.verb = null;
                 }
@@ -61,37 +61,26 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onUserList(String channel, User[] users) {
-        super.onUserList(channel, users);
+        for (User usr :
+                users) {
+            String nick = usr.getNick();
+            this.opNick(nick);
+        }
     }
 
     @Override
     protected void onMessage(String channel, String sender, String login, String hostname, String message) {
         Transaction transaction = session.getTransaction();
-        if(!transaction.isActive())
+        if (!transaction.isActive())
             transaction = session.beginTransaction();
         super.onMessage(channel, sender, login, hostname, message);
-        UserService userService = new UserService(sender,login,hostname, session);
+        UserService userService = new UserService(sender, login, hostname, session);
         pl.quider.standalone.irc.model.User user = userService.getUser();
         userService.userPresent(user);
         Message msg = new Message(channel, sender, user, message);
-        MessageService messageService = new MessageService(msg,this, this.session);
+        MessageService messageService = new MessageService(msg, this, this.session);
         messageService.executeCommand(this);
         transaction.commit();
-    }
-
-    @Override
-    protected void onPrivateMessage(String sender, String login, String hostname, String message) {
-        super.onPrivateMessage(sender, login, hostname, message);
-    }
-
-    @Override
-    protected void onAction(String sender, String login, String hostname, String target, String action) {
-        super.onAction(sender, login, hostname, target, action);
-    }
-
-    @Override
-    protected void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice) {
-        super.onNotice(sourceNick, sourceLogin, sourceHostname, target, notice);
     }
 
     @Override
@@ -99,30 +88,11 @@ public class MyBot extends PircBot {
         UserService userService = new UserService(sender, login, hostname, this.session);
         userService.joined(channel);
         pl.quider.standalone.irc.model.User user = userService.getUser();
-        if(user.isOp()){
+        if (user.isOp()) {
             this.op(channel, user.getNickName());
         }
     }
 
-    @Override
-    protected void onPart(String channel, String sender, String login, String hostname) {
-        super.onPart(channel, sender, login, hostname);
-    }
-
-    @Override
-    protected void onNickChange(String oldNick, String login, String hostname, String newNick) {
-        super.onNickChange(oldNick, login, hostname, newNick);
-    }
-
-    @Override
-    protected void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
-        super.onKick(channel, kickerNick, kickerLogin, kickerHostname, recipientNick, reason);
-    }
-
-    @Override
-    protected void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
-        super.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
-    }
 
     @Override
     protected void onTopic(String channel, String topic) {
@@ -135,24 +105,18 @@ public class MyBot extends PircBot {
     }
 
     @Override
-    protected void onChannelInfo(String channel, int userCount, String topic) {
-        super.onChannelInfo(channel, userCount, topic);
-    }
-
-    @Override
-    protected void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
-        super.onMode(channel, sourceNick, sourceLogin, sourceHostname, mode);
-    }
-
-    @Override
-    protected void onUserMode(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
-        super.onUserMode(targetNick, sourceNick, sourceLogin, sourceHostname, mode);
-    }
-
-    @Override
     protected void onOp(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient) {
+        this.opNick(recipient);
+    }
+
+    /**
+     * Sends WHOIS and after response finds a user in
+     * database and op it
+     * @param recipient
+     */
+    private void opNick(String recipient) {
         this.verb = new Op(this);
-        sendRawLine("WHOIS "+recipient);
+        sendRawLine("WHOIS " + recipient);
     }
 
     @Override
