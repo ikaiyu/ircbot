@@ -2,12 +2,12 @@ package pl.quider.standalone.irc;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jibble.pircbot.DccChat;
-import org.jibble.pircbot.DccFileTransfer;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
+import pl.quider.standalone.irc.dbsession.MySqlDatabaseSession;
 import pl.quider.standalone.irc.model.Message;
+import pl.quider.standalone.irc.services.ChannelService;
 import pl.quider.standalone.irc.services.MessageService;
 import pl.quider.standalone.irc.services.UserService;
 import pl.quider.standalone.irc.verbs.Op;
@@ -23,11 +23,13 @@ public class MyBot extends PircBot {
 
     boolean isOp;
     private Session session;
+    private ADatabaseSession dbSession;
     private Verb verb;
 
 
     public MyBot(ADatabaseSession session) {
         super();
+        this.dbSession = session;
         this.session = session.getSession();
 
     }
@@ -61,26 +63,27 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onUserList(String channel, User[] users) {
-        for (User usr :
-                users) {
+        for (User usr : users) {
             String nick = usr.getNick();
-            this.opNick(nick);
+            if(usr.isOp()) {
+                this.opNick(nick);
+            }
         }
     }
 
     @Override
     protected void onMessage(String channel, String sender, String login, String hostname, String message) {
-        Transaction transaction = session.getTransaction();
-        if (!transaction.isActive())
-            transaction = session.beginTransaction();
-        super.onMessage(channel, sender, login, hostname, message);
         UserService userService = new UserService(sender, login, hostname, session);
         pl.quider.standalone.irc.model.User user = userService.getUser();
         userService.userPresent(user);
+        userService.updateStats(message);
+
         Message msg = new Message(channel, sender, user, message);
         MessageService messageService = new MessageService(msg, this, this.session);
-        messageService.executeCommand(this);
-        transaction.commit();
+        messageService.executeVerb(this);
+
+        ChannelService channelService = new ChannelService(this.session);
+        channelService.updateStats(user, msg);
     }
 
     @Override
@@ -92,7 +95,6 @@ public class MyBot extends PircBot {
             this.op(channel, user.getNickName());
         }
     }
-
 
     @Override
     protected void onTopic(String channel, String topic) {

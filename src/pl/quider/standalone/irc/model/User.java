@@ -72,4 +72,5 @@ public class User implements Serializable{
     public void setLastSeen(Date lastSeen) {
         this.lastSeen = lastSeen;
     }
+
 }

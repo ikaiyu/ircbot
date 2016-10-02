@@ -29,7 +29,7 @@ public class MessageService {
         this.session = session;
     }
 
-    public void executeCommand(final MyBot bot) {
+    public void executeVerb(final MyBot bot) {
         this.saveMessage();
         if (isUserCallingMe()) {
             if (!msg.getUser().getLogin().equals("quider"))
@@ -37,14 +37,20 @@ public class MessageService {
             try {
                 String[] split = msg.getMessage().split(" ");
                 String verb = split[1];
-                String parameter = split[2];
+
+                StringBuilder parameter = new StringBuilder();
+                if (split.length <= 3){
+                    for(int i = 2; i<= split.length; i++) {
+                        parameter.append(split[i]).append((char)7);
+                    }
+                }
 
                 verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
                 Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
 
                 Constructor<Verb> constructor = aClass.getConstructor(MyBot.class);
                 Verb verbInstance = constructor.newInstance(bot);
-                verbInstance.execute(parameter);
+                verbInstance.execute(parameter.toString());
 
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -62,10 +68,12 @@ public class MessageService {
 
     private void saveMessage() {
         try {
-            session.save(msg);
             Transaction transaction = session.getTransaction();
-            if(transaction.isActive())
-                transaction.commit();
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+            session.save(msg);
+            transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }

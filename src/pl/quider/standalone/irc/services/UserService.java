@@ -114,14 +114,20 @@ public class UserService {
      */
     public void userPresent(User user) {
         try {
-            Transaction transaction = session.getTransaction();
-            if(!transaction.isActive())
-                transaction= session.beginTransaction();
+            Transaction transaction = session.beginTransaction();
             user.setLastSeen(new Date());
             session.save(user);
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void getStats() {
+
+    }
+
+    public void updateStats(String message) {
+
     }
 }
