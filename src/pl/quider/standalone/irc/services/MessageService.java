@@ -23,12 +23,24 @@ public class MessageService {
     private Message msg;
     private Session session;
 
+    /**
+     * Creates object with parameters
+     * @param msg
+     * @param myBot
+     * @param session
+     */
     public MessageService(Message msg, MyBot myBot, Session session) {
         this.mybot = myBot;
         this.msg = msg;
         this.session = session;
     }
 
+    /**
+     * Executes verbs which are in message. For example when user write:
+     * !bot join #channel
+     * then Join verb class is being called.
+     * @param bot Bot object class.
+     */
     public void executeVerb(final MyBot bot) {
         this.saveMessage();
         if (isUserCallingMe()) {
@@ -66,6 +78,9 @@ public class MessageService {
         }
     }
 
+    /**
+     * Saves message to database.
+     */
     private void saveMessage() {
         try {
             Transaction transaction = session.getTransaction();
@@ -82,7 +97,7 @@ public class MessageService {
     /**
      * checks if user call bot
      *
-     * @return
+     * @return true or false
      */
     public boolean isUserCallingMe() {
         return this.msg.getMessage().startsWith("!bot ");

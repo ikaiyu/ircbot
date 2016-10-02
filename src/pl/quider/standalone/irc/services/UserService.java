@@ -21,6 +21,13 @@ public class UserService {
     private Session session;
     private User user;
 
+    /**
+     * Creates new object of class.
+     * @param sender
+     * @param login
+     * @param hostname
+     * @param session
+     */
     public UserService(String sender, String login, String hostname, Session session) {
         this.nick =sender;
         this.login= login;
@@ -29,7 +36,7 @@ public class UserService {
     }
 
      /**
-     *
+     * Gets user from database or creates new.
      * @return
      */
     public User getUser() {
@@ -44,7 +51,7 @@ public class UserService {
     }
 
     /**
-     *
+     * Creates new user in database and sets it to propery.
      */
     private void createNewUser() {
         try {
@@ -63,8 +70,8 @@ public class UserService {
     }
 
     /**
-     *
-     * @return
+     * Checks if user exists in database.
+     * @return user object if exists. Otherwise null.
      */
     private boolean userExists() {
         Query query = session.createQuery(QUERY);
