@@ -51,17 +51,17 @@ public class MessageService {
                 String verb = split[1];
 
                 StringBuilder parameter = new StringBuilder();
-                if (split.length <= 3){
-                    for(int i = 2; i<= split.length; i++) {
-                        parameter.append(split[i]).append((char)7);
+                if (split.length >= 3){
+                    for(int i = 2; i<= split.length -1; i++) {
+                        parameter.append(split[i]).append(MyBot.VERB_PARAM_DELIMITER);
                     }
                 }
 
                 verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
                 Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
 
-                Constructor<Verb> constructor = aClass.getConstructor(MyBot.class);
-                Verb verbInstance = constructor.newInstance(bot);
+                Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
+                Verb verbInstance = constructor.newInstance(bot, msg);
                 verbInstance.execute(parameter.toString());
 
             } catch (ClassNotFoundException e) {

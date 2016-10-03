@@ -21,6 +21,7 @@ import java.net.InetAddress;
  */
 public class MyBot extends PircBot {
 
+    public static final String VERB_PARAM_DELIMITER = "&%%&";
     boolean isOp;
     private Session session;
     private ADatabaseSession dbSession;
@@ -117,7 +118,7 @@ public class MyBot extends PircBot {
      * @param recipient
      */
     private void opNick(String recipient) {
-        this.verb = new Op(this);
+        this.verb = new Op(this, null);
         sendRawLine("WHOIS " + recipient);
     }
 

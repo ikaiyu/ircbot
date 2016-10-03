@@ -19,7 +19,7 @@
             root
         </property>
         <property name="hibernate.connection.password">
-
+            100Zlotoweczek
         </property>
 
 

@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by Adrian on 02.10.2016.
  */
 @Entity
-@Table(name="channel_user")
+@Table(name="bot_channel")
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,7 +14,7 @@ public class Channel {
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(name="channelName")
+    @Column(name="channel")
     private String channelName;
     @Column(name="wordCount")
     private int wordCount;
