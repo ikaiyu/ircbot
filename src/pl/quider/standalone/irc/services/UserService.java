@@ -121,13 +121,28 @@ public class UserService {
      */
     public void userPresent(User user) {
         try {
-            Transaction transaction = session.beginTransaction();
+
+            Transaction transaction = session.getTransaction();
+            if(!transaction.isActive()){
+                transaction = session.beginTransaction();
+            }
             user.setLastSeen(new Date());
             session.save(user);
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void opUser(){
+        Transaction transaction = session.getTransaction();
+        if(!transaction.isActive()){
+            transaction.begin();
+        }
+        getUser();
+        this.user.setOp(true);
+        session.save(this.user);
+        transaction.commit();
     }
 
     public void getStats() {

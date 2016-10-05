@@ -118,7 +118,7 @@ public class MyBot extends PircBot {
      * @param recipient
      */
     private void opNick(String recipient) {
-        this.verb = new Op(this, null);
+        this.verb = new Op(this);
         sendRawLine("WHOIS " + recipient);
     }
 
