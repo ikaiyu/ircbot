@@ -44,8 +44,6 @@ public class MessageService {
     public void executeVerb(final MyBot bot) {
         this.saveMessage();
         if (isUserCallingMe()) {
-            if (!msg.getUser().getLogin().equals("quider"))
-                return;
             try {
                 String[] split = msg.getMessage().split(" ");
                 String verb = split[1];
