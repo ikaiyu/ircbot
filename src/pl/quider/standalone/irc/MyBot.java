@@ -2,6 +2,7 @@ package pl.quider.standalone.irc;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
@@ -13,8 +14,10 @@ import pl.quider.standalone.irc.services.UserService;
 import pl.quider.standalone.irc.verbs.Op;
 import pl.quider.standalone.irc.verbs.Verb;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.util.List;
 
 /**
  * Created by Adrian on 27.09.2016.
@@ -47,7 +50,18 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onDisconnect() {
-        super.onDisconnect();
+        try {
+            this.connect("open.ircnet.net");
+            ChannelService channelService = new ChannelService(session);
+            List list = channelService.joinChannels();
+            list.forEach(item->{
+                this.joinChannel((String) item);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IrcException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

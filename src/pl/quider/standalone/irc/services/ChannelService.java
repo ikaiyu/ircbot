@@ -85,4 +85,10 @@ public class ChannelService {
             return "Błąd odczytu! Następnym razem.";
         }
     }
+
+    public List joinChannels() {
+        Query query = session.createQuery("select c.channelName from Channel as c group by c.channelName");
+        List resultList = query.getResultList();
+        return resultList;
+    }
 }
