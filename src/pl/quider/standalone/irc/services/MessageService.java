@@ -25,6 +25,7 @@ public class MessageService {
 
     /**
      * Creates object with parameters
+     *
      * @param msg
      * @param myBot
      * @param session
@@ -39,40 +40,28 @@ public class MessageService {
      * Executes verbs which are in message. For example when user write:
      * !bot join #channel
      * then Join verb class is being called.
+     *
      * @param bot Bot object class.
      */
-    public void executeVerb(final MyBot bot) {
+    public void executeVerb(final MyBot bot) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         this.saveMessage();
         if (isUserCallingMe()) {
-            try {
-                String[] split = msg.getMessage().split(" ");
-                String verb = split[1];
+            String[] split = msg.getMessage().split(" ");
+            String verb = split[1];
 
-                StringBuilder parameter = new StringBuilder();
-                if (split.length >= 3){
-                    for(int i = 2; i<= split.length -1; i++) {
-                        parameter.append(split[i]).append(MyBot.VERB_PARAM_DELIMITER);
-                    }
+            StringBuilder parameter = new StringBuilder();
+            if (split.length >= 3) {
+                for (int i = 2; i <= split.length - 1; i++) {
+                    parameter.append(split[i]).append(MyBot.VERB_PARAM_DELIMITER);
                 }
-
-                verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
-                Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
-
-                Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
-                Verb verbInstance = constructor.newInstance(bot, msg);
-                verbInstance.execute(parameter.toString());
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
             }
+
+            verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
+            Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
+
+            Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
+            Verb verbInstance = constructor.newInstance(bot, msg);
+            verbInstance.execute(parameter.toString());
         }
     }
 
@@ -80,15 +69,18 @@ public class MessageService {
      * Saves message to database.
      */
     private void saveMessage() {
+        Transaction transaction = null;
         try {
-            Transaction transaction = session.getTransaction();
-            if (!transaction.isActive()) {
-                transaction.begin();
+            transaction = session.getTransaction();
+            if (transaction == null || !transaction.isActive()) {
+                transaction = session.beginTransaction();
             }
             session.save(msg);
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
+            transaction.rollback();
+            throw e;
         }
     }
 

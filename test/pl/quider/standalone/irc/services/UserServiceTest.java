@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.stubbing.OngoingStubbing;
+import pl.quider.standalone.irc.TestUtils;
 import pl.quider.standalone.irc.model.User;
 
 import java.util.ArrayList;
@@ -42,13 +43,7 @@ public class UserServiceTest {
         when(session.createQuery(any(String.class))).thenReturn(mockQuery);
         when(session.beginTransaction()).thenReturn(mock(Transaction.class));
         ArrayList arrayList = new ArrayList();
-        User mockUser = new User();
-        mockUser.setId(1);
-        mockUser.setLastSeen(new Date());
-        mockUser.setLogin("login");
-        mockUser.setMask("hostname");
-        mockUser.setNickName("nick");
-        mockUser.setOp(true);
+        User mockUser = TestUtils.prepareUserMock();
         arrayList.add(mockUser);
         when(mockQuery.getResultList()).thenReturn(arrayList);
         try {
@@ -81,27 +76,15 @@ public class UserServiceTest {
 
     @Test
     public void joined() throws Exception {
-        fail();
-    }
+        try {
+            User user = TestUtils.prepareUserMock();
+            doReturn(user).when(userService).getUser();
+            when(session.beginTransaction()).thenReturn(mock(Transaction.class));
+            userService.joined("#channel");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
 
-    @Test
-    public void userPresent() throws Exception {
-        fail();
-    }
-
-    @Test
-    public void opUser() throws Exception {
-        fail();
-    }
-
-    @Test
-    public void getStats() throws Exception {
-        fail();
-    }
-
-    @Test
-    public void updateStats() throws Exception {
-        fail();
     }
 
 }

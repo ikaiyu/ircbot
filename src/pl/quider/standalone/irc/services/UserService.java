@@ -124,7 +124,7 @@ public class UserService {
         try {
 
             Transaction transaction = session.getTransaction();
-            if(!transaction.isActive()){
+            if(transaction== null || !transaction.isActive()){
                 transaction = session.beginTransaction();
             }
             user.setLastSeen(new Date());
@@ -132,6 +132,7 @@ public class UserService {
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
