@@ -56,13 +56,26 @@ public class MessageService {
                 }
             }
 
-            verb = verb.substring(0, 1).toUpperCase() + verb.substring(1).toLowerCase();
-            Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
-
-            Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
-            Verb verbInstance = constructor.newInstance(bot, msg);
+            Verb verbInstance = factorVerb(verb);
             verbInstance.execute(parameter.toString());
         }
+    }
+
+    /**
+     *
+     * @param verbClassName
+     * @return
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    protected Verb factorVerb(final String verbClassName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        String verb = verbClassName.substring(0, 1).toUpperCase() + verbClassName.substring(1).toLowerCase();
+        Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
+        Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
+        return constructor.newInstance(mybot,msg);
     }
 
     /**

@@ -16,6 +16,7 @@ import pl.quider.standalone.irc.verbs.Verb;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class MyBot extends PircBot {
             this.connect("open.ircnet.net");
             ChannelService channelService = new ChannelService(session);
             List list = channelService.joinChannels();
-            list.forEach(item->{
+            list.forEach(item -> {
                 this.joinChannel((String) item);
             });
         } catch (IOException e) {
@@ -80,7 +81,7 @@ public class MyBot extends PircBot {
     protected void onUserList(String channel, User[] users) {
         for (User usr : users) {
             String nick = usr.getNick();
-            if(usr.isOp()) {
+            if (usr.isOp()) {
                 this.opNick(nick);
             }
         }
@@ -88,17 +89,30 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onMessage(String channel, String sender, String login, String hostname, String message) {
-        UserService userService = new UserService(sender, login, hostname, session);
-        pl.quider.standalone.irc.model.User user = userService.getUser();
-        userService.userPresent(user);
-        userService.updateStats(message);
+        try {
+            UserService userService = new UserService(sender, login, hostname, session);
+            pl.quider.standalone.irc.model.User user = userService.getUser();
+            userService.userPresent(user);
+            userService.updateStats(message);
 
-        Message msg = new Message(channel, sender, user, message);
-        MessageService messageService = new MessageService(msg, this, this.session);
-        messageService.executeVerb(this);
+            Message msg = new Message(channel, sender, user, message);
+            MessageService messageService = new MessageService(msg, this, this.session);
+            messageService.executeVerb(this);
+            ChannelService channelService = new ChannelService(this.session);
+            channelService.updateStats(user, msg);
 
-        ChannelService channelService = new ChannelService(this.session);
-        channelService.updateStats(user, msg);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -129,6 +143,7 @@ public class MyBot extends PircBot {
     /**
      * Sends WHOIS and after response finds a user in
      * database and op it
+     *
      * @param recipient
      */
     private void opNick(String recipient) {
