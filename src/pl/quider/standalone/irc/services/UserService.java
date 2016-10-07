@@ -53,19 +53,20 @@ public class UserService {
     /**
      * Creates new user in database and sets it to propery.
      */
-    private void createNewUser() {
+    public void createNewUser() {
         try {
             user = new User();
             user.setNickName(getNick());
             user.setLogin(getLogin());
             user.setMask(getHost());
             Transaction transaction = session.getTransaction();
-            if(!transaction.isActive())
+            if(transaction == null || !transaction.isActive())
                 transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
@@ -73,7 +74,7 @@ public class UserService {
      * Checks if user exists in database.
      * @return user object if exists. Otherwise null.
      */
-    private boolean userExists() {
+    public boolean userExists() {
         Query query = session.createQuery(QUERY);
         query.setParameter("host", getHost());
         query.setParameter("login", getLogin());
