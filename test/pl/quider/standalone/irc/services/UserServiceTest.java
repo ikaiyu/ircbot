@@ -14,6 +14,7 @@ import pl.quider.standalone.irc.model.User;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.Before;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
