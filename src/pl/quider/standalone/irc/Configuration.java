@@ -3,23 +3,21 @@ package pl.quider.standalone.irc;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.hibernate.procedure.ParameterMisuseException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by Adrian on 27.09.2016.
  */
 public class Configuration {
 
-    Map<String, String> params;
+
+    private Properties properties;
 
     public Configuration() {
-        params = new HashMap<String, String>();
     }
 
     /**
@@ -29,8 +27,7 @@ public class Configuration {
      * @throws ParameterMisuseException
      */
     public void loadConfig(String pathToConfigFile) throws IOException, ParameterMisuseException {
-        BufferedReader reader = this.openFile(pathToConfigFile);
-        this.readParams(reader);
+        properties = this.openFile(pathToConfigFile);
     }
 
     /**
@@ -38,35 +35,20 @@ public class Configuration {
      * @param pathToConfigFile
      * @return
      */
-    private BufferedReader openFile(String pathToConfigFile) {
-        throw new NotYetImplementedException();
+    protected Properties openFile(String pathToConfigFile) throws IOException {
+        Properties properties = new Properties();
+        File file = new File(pathToConfigFile);
+        InputStream resourceAsStream = new FileInputStream(file);
+        properties.load(resourceAsStream);
+        return properties;
     }
 
-    /**
-     * Saves params from bufferedReader to map
-     * @param bufferedReader reader of file
-     * @throws IOException
-     */
-    private void readParams(BufferedReader bufferedReader) throws IOException {
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            if (this.isCommentedOut(line)) {
-                continue;
-            }
-            String[] split = line.split("=");
-            if (split.length != 2) {
-                throw new ParameterMisuseException("Valid config is: <key> = <value of key> per line.");
-            }
-            this.params.put(split[0].trim(), split[1].trim());
-        }
-    }
-
-    /**
+       /**
      * returns all keys
      * @return
      */
     public Collection getAllKeys(){
-        return this.params.keySet();
+        return this.properties.keySet();
     }
 
     /**
@@ -76,8 +58,8 @@ public class Configuration {
      * @throws RuntimeException
      */
     public String getValue(String key) throws RuntimeException{
-        if(this.params.containsKey(key)) {
-            return this.params.get(key);
+        if(this.properties.containsKey(key)) {
+            return (String) this.properties.get(key);
         } else {
             throw new RuntimeException("No such key");
         }
@@ -90,7 +72,7 @@ public class Configuration {
      * @param line
      * @return
      */
-    private boolean isCommentedOut(String line) {
+    protected boolean isCommentedOut(String line) {
         return false;
     }
 }
