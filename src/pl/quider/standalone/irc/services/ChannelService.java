@@ -101,4 +101,10 @@ public class ChannelService {
         List resultList = query.getResultList();
         return resultList;
     }
+
+    public List<Channel> getTopStats() {
+        Query query = session.createQuery("from Channel as c order by wordCount");
+        List resultList = query.getResultList();
+        return resultList;
+    }
 }
