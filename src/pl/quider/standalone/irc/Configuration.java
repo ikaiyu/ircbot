@@ -64,15 +64,4 @@ public class Configuration {
             throw new RuntimeException("No such key");
         }
     }
-
-    /**
-     * Not implemented yet
-     * TODO
-     *
-     * @param line
-     * @return
-     */
-    protected boolean isCommentedOut(String line) {
-        return false;
-    }
 }
