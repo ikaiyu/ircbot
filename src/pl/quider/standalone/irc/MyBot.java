@@ -2,9 +2,9 @@ package pl.quider.standalone.irc;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jibble.pircbot.IrcException;
-import org.jibble.pircbot.PircBot;
-import org.jibble.pircbot.User;
+import pl.quider.standalone.irc.protocol.IrcException;
+import pl.quider.standalone.irc.protocol.PircBot;
+import pl.quider.standalone.irc.protocol.User;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
 import pl.quider.standalone.irc.dbsession.MySqlDatabaseSession;
 import pl.quider.standalone.irc.model.Message;
@@ -28,13 +28,11 @@ public class MyBot extends PircBot {
     public static final String VERB_PARAM_DELIMITER = "&%%&";
     boolean isOp;
     private Session session;
-    private ADatabaseSession dbSession;
     private Verb verb;
 
 
     public MyBot(ADatabaseSession session) {
         super();
-        this.dbSession = session;
         this.session = session.getSession();
 
     }
@@ -46,7 +44,7 @@ public class MyBot extends PircBot {
 
     @Override
     protected void onConnect() {
-        super.onConnect();
+
     }
 
     @Override
@@ -126,11 +124,6 @@ public class MyBot extends PircBot {
     }
 
     @Override
-    protected void onTopic(String channel, String topic) {
-        super.onTopic(channel, topic);
-    }
-
-    @Override
     protected void onTopic(String channel, String topic, String setBy, long date, boolean changed) {
         super.onTopic(channel, topic, setBy, date, changed);
     }
@@ -156,56 +149,10 @@ public class MyBot extends PircBot {
         super.onDeop(channel, sourceNick, sourceLogin, sourceHostname, recipient);
     }
 
-    @Override
-    public String getNick() {
-        return super.getNick();
-    }
-
-    @Override
-    public int[] longToIp(long address) {
-        return super.longToIp(address);
-    }
-
-    @Override
-    public long ipToLong(byte[] address) {
-        return super.ipToLong(address);
-    }
-
-    @Override
-    public void setEncoding(String charset) throws UnsupportedEncodingException {
-        super.setEncoding(charset);
-    }
-
-    @Override
-    public String getEncoding() {
-        return super.getEncoding();
-    }
-
-    @Override
-    public InetAddress getInetAddress() {
-        return super.getInetAddress();
-    }
-
-    @Override
-    public void setDccInetAddress(InetAddress dccInetAddress) {
-        super.setDccInetAddress(dccInetAddress);
-    }
-
-    @Override
-    public InetAddress getDccInetAddress() {
-        return super.getDccInetAddress();
-    }
-
-    @Override
-    public int[] getDccPorts() {
-        return super.getDccPorts();
-    }
-
-    @Override
-    public void setDccPorts(int[] ports) {
-        super.setDccPorts(ports);
-    }
-
+    /**
+     * Getter of session object
+     * @return hibernate session
+     */
     public Session getSession() {
         return session;
     }

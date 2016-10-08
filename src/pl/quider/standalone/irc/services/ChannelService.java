@@ -67,11 +67,17 @@ public class ChannelService {
      * @param msg message object.
      * @return count of words in message.
      */
-    private int getCountWordsFromMessage(Message msg) {
+    protected int getCountWordsFromMessage(Message msg) {
         String[] split = msg.getMessage().split(" ");
         return split.length;
     }
 
+    /**
+     *
+     * @param parameter
+     * @param msg
+     * @return
+     */
     public String getStats(String parameter, Message msg) {
         try {
             String hql = "from Channel as c where c.user = :user and c.channelName = :channel";
@@ -86,6 +92,10 @@ public class ChannelService {
         }
     }
 
+    /**
+     * fetches to all channels which are mentioned in table channel
+     * @return list of channel names
+     */
     public List joinChannels() {
         Query query = session.createQuery("select c.channelName from Channel as c group by c.channelName");
         List resultList = query.getResultList();

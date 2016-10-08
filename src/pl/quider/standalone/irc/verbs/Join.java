@@ -16,8 +16,11 @@ public class Join extends Verb {
     public void execute(String parameter) {
         String[] split = parameter.split(MyBot.VERB_PARAM_DELIMITER);
         for (String channel : split) {
-            if (channel.startsWith("#"))
+            if (channel.startsWith("#")) {
                 this.bot.joinChannel(channel);
+            } else {
+                this.bot.joinChannel("#"+channel);
+            }
         }
     }
 }

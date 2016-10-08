@@ -1,7 +1,7 @@
 package pl.quider.standalone.irc;
 
-import org.jibble.pircbot.IrcException;
-import org.jibble.pircbot.NickAlreadyInUseException;
+import pl.quider.standalone.irc.protocol.IrcException;
+import pl.quider.standalone.irc.protocol.NickAlreadyInUseException;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
 import pl.quider.standalone.irc.dbsession.MySqlDatabaseSession;
 
