@@ -68,9 +68,4 @@ public class MessageServiceTest {
         }
     }
 
-    @Test
-    public void isUserCallingMe() throws Exception {
-        fail();
-    }
-
 }
