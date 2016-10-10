@@ -96,14 +96,14 @@ public class ChannelService {
      * fetches to all channels which are mentioned in table channel
      * @return list of channel names
      */
-    public List joinChannels() {
+    public List joinChannels() throws Exception{
         Query query = session.createQuery("select c.channelName from Channel as c group by c.channelName");
         List resultList = query.getResultList();
         return resultList;
     }
 
-    public List<Channel> getTopStats() {
-        Query query = session.createQuery("from Channel as c order by wordCount");
+    public List<Channel> getTopStats() throws Exception {
+        Query query = session.createQuery("from Channel as c order by wordCount desc").setMaxResults(5);
         List resultList = query.getResultList();
         return resultList;
     }

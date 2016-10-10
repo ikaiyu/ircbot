@@ -43,7 +43,7 @@ public class MessageService {
      *
      * @param bot Bot object class.
      */
-    public void executeVerb(final MyBot bot) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public void executeVerb(final MyBot bot) throws Exception {
         this.saveMessage();
         if (isUserCallingMe()) {
             String[] split = msg.getMessage().split(" ");

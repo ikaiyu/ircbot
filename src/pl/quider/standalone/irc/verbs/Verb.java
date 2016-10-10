@@ -16,5 +16,5 @@ public abstract class Verb {
         this.msg = msg;
     }
 
-    public abstract void execute(String parameter);
+    public abstract void execute(String parameter) throws Exception;
 }

@@ -60,6 +60,8 @@ public class MyBot extends PircBot {
             e.printStackTrace();
         } catch (IrcException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -68,7 +70,11 @@ public class MyBot extends PircBot {
         switch (code) {
             case 311:
                 if (this.verb != null) {
-                    this.verb.execute(response);
+                    try {
+                        this.verb.execute(response);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     this.verb = null;
                 }
                 break;
@@ -108,6 +114,8 @@ public class MyBot extends PircBot {
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

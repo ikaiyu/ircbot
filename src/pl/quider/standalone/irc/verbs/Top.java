@@ -17,17 +17,35 @@ public class Top extends Verb {
     }
 
     @Override
-    public void execute(String parameter) {
+    public void execute(String parameter) throws Exception {
         ChannelService channelService = new ChannelService(bot.getSession());
         List<Channel> topStats = channelService.getTopStats();
-        for(int i = 0; i <=4;i++) {
-            StringBuilder stringStat = new StringBuilder(i + 1).append(". ");
+        for (int i = 0; i <= 4; i++) {
             Channel channel = topStats.get(i);
-            stringStat.append(channel.getUser().getNickName());
-            stringStat.append(" - ");
-            stringStat.append(channel.getWordCount()).append( "słów.");
-            bot.sendMessage(msg.getChannel(), stringStat.toString());
+            this.write(prepareLine(i,channel));
         }
         //TODO: where asking person is in table
+    }
+
+    /**
+     *
+     * @param i
+     * @param channel
+     * @return
+     */
+    protected String prepareLine(int i, Channel channel) {
+        StringBuilder stringStat = new StringBuilder(Integer.toString(i + 1)).append(". ");
+        stringStat.append(channel.getUser().getNickName());
+        stringStat.append(" - ");
+        stringStat.append(channel.getWordCount()).append(" słów.");
+        return  stringStat.toString();
+    }
+
+    /**
+     *
+     * @param stringStat
+     */
+    protected void write(String stringStat) {
+        bot.sendMessage(msg.getChannel(), stringStat);
     }
 }

@@ -1,6 +1,7 @@
 package pl.quider.standalone.irc.dbsession;
 
 import com.fasterxml.classmate.AnnotationConfiguration;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,28 +22,23 @@ import javax.persistence.Persistence;
  */
 public class MySqlDatabaseSession extends ADatabaseSession {
 
-    protected MySqlDatabaseSession(){
-        try {
-            Configuration configuration = new Configuration();
-            configuration.configure("hibernate.cfg.xml");
-            configuration.addAnnotatedClass(User.class);
-            configuration.addAnnotatedClass(ChannelHistory.class);
-            configuration.addAnnotatedClass(Message.class);
-            configuration.addAnnotatedClass(Channel.class);
+    protected MySqlDatabaseSession() throws HibernateException {
+        Configuration configuration = new Configuration();
+        configuration.configure("hibernate.cfg.xml");
+        configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(ChannelHistory.class);
+        configuration.addAnnotatedClass(Message.class);
+        configuration.addAnnotatedClass(Channel.class);
 
-            StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-            SessionFactory sessionFactory = configuration.buildSessionFactory(ssrb.build());
+        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+        SessionFactory sessionFactory = configuration.buildSessionFactory(ssrb.build());
 
-            if(session==null) {
-                session = sessionFactory.openSession();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (session == null) {
+            session = sessionFactory.openSession();
         }
     }
 
-    public static ADatabaseSession create() {
+    public static ADatabaseSession create() throws HibernateException {
 
         if (instance == null) {
             instance = new MySqlDatabaseSession();
