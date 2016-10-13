@@ -45,7 +45,6 @@ public class Pogoda extends Verb {
 
                 String s = sbMessage.toString();
                 this.sendMessage(s);
-                sendMessage(s);
             } catch (IOException e) {
                 sendMessage("Em... Coś nie halo...");
                 e.printStackTrace();
