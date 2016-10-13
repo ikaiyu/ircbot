@@ -19,7 +19,7 @@ public class Top extends Verb {
     @Override
     public void execute(String parameter) throws Exception {
         ChannelService channelService = new ChannelService(bot.getSession());
-        List<Channel> topStats = channelService.getTopStats();
+        List<Channel> topStats = channelService.getTopStats(msg.getChannel());
         for (int i = 0; i <= 4; i++) {
             Channel channel = topStats.get(i);
             this.write(prepareLine(i,channel));
@@ -38,6 +38,7 @@ public class Top extends Verb {
         stringStat.append(channel.getUser().getNickName());
         stringStat.append(" - ");
         stringStat.append(channel.getWordCount()).append(" słów.");
+        stringStat.append(" (").append(channel.getUser().getLogin()).append("@").append(channel.getUser().getMask()).append(")");
         return  stringStat.toString();
     }
 

@@ -102,8 +102,15 @@ public class ChannelService {
         return resultList;
     }
 
-    public List<Channel> getTopStats() throws Exception {
-        Query query = session.createQuery("from Channel as c order by wordCount desc").setMaxResults(5);
+    /**
+     * Gets stats from channel
+     * @param channel
+     * @return
+     * @throws Exception
+     */
+    public List<Channel> getTopStats(String channel) throws Exception {
+        Query query = session.createQuery("from Channel as c where channelName = :channel order by wordCount desc").setMaxResults(5);
+        query.setParameter("channel", channel);
         List resultList = query.getResultList();
         return resultList;
     }
