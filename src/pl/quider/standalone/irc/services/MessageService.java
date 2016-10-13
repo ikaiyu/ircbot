@@ -5,11 +5,14 @@ import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import pl.quider.standalone.irc.MyBot;
+import pl.quider.standalone.irc.filters.EnshortLinkFiler;
 import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.verbs.Verb;
 
+import javax.annotation.processing.Filer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +48,7 @@ public class MessageService {
      */
     public void executeVerb(final MyBot bot) throws Exception {
         this.saveMessage();
+        this.filter();
         if (isUserCallingMe()) {
             String[] split = msg.getMessage().split(" ");
             String verb = split[1];
@@ -61,8 +65,15 @@ public class MessageService {
         }
     }
 
+    protected void filter() {
+        String message = msg.getMessage();
+        if (message.startsWith("http://") || message.startsWith("https://")) {
+            EnshortLinkFiler enshortLinkFiler = new EnshortLinkFiler(msg, mybot);
+            enshortLinkFiler.execute();
+        }
+    }
+
     /**
-     *
      * @param verbClassName
      * @return
      * @throws ClassNotFoundException
@@ -75,7 +86,7 @@ public class MessageService {
         String verb = verbClassName.substring(0, 1).toUpperCase() + verbClassName.substring(1).toLowerCase();
         Class<Verb> aClass = (Class<Verb>) Class.forName("pl.quider.standalone.irc.verbs." + verb);
         Constructor<Verb> constructor = aClass.getConstructor(MyBot.class, Message.class);
-        return constructor.newInstance(mybot,msg);
+        return constructor.newInstance(mybot, msg);
     }
 
     /**
