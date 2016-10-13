@@ -18,14 +18,14 @@ import java.net.URLConnection;
  * Created by Adrian on 12.10.2016.
  */
 public class Pogoda extends Verb {
-    private static final String TEMPERATURE = "temperature";
-    private static final String VALUE = "value";
-    private static final String PRESSURE = "pressure";
-    private static final String HUMIDITY = "humidity";
+    public static final String TEMPERATURE = "temperature";
+    public static final String VALUE = "value";
+    public static final String PRESSURE = "pressure";
+    public static final String HUMIDITY = "humidity";
     public static final String POST = "POST";
+    public static String API_CODE = "&APPID=4c1606b8ad9cc95f39e300113634e47f&mode=xml";
+    public static String URL = "http://api.openweathermap.org/data/2.5/forecast/city?q=";
 
-    private static String API_CODE = "&APPID=4c1606b8ad9cc95f39e300113634e47f&mode=xml";
-    private static String URL = "http://api.openweathermap.org/data/2.5/forecast/city?q=";
     private URL url;
 
     public Pogoda(MyBot mybot, Message msg) throws MalformedURLException {
@@ -61,14 +61,25 @@ public class Pogoda extends Verb {
         }
     }
 
-    private InputStream getInputStream(String[] split) throws IOException {
+    /**
+     *
+     * @param split
+     * @return
+     * @throws IOException
+     */
+    protected InputStream getInputStream(String[] split) throws IOException {
         this.url = new URL(URL + split[0] + API_CODE);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.setRequestMethod(POST);
         return request.getInputStream();
     }
 
-    private StringBuilder getStringBuilder(NodeList childNodes) {
+    /**
+     *
+     * @param childNodes
+     * @return
+     */
+    protected StringBuilder getStringBuilder(NodeList childNodes) {
         StringBuilder sbMessage= new StringBuilder();
 
         for (int i = 0; i <= childNodes.getLength() - 1; i++) {
@@ -87,7 +98,15 @@ public class Pogoda extends Verb {
         return sbMessage;
     }
 
-    private NodeList getNodeList(InputStream is) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     *
+     * @param is
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    protected NodeList getNodeList(InputStream is) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(is);
