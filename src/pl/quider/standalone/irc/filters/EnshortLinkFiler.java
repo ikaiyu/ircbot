@@ -1,23 +1,20 @@
 package pl.quider.standalone.irc.filters;
 
-import org.w3c.dom.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import pl.quider.standalone.irc.MyBot;
 import pl.quider.standalone.irc.model.Message;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * Created by Adrian.Kozlowski on 2016-10-13.
@@ -51,19 +48,16 @@ public class EnshortLinkFiler extends Filter {
         try {
             URL theUrl = getUrl();
             InputStream is = getInputStream(theUrl);
-            Element root = getElement(is);
+            String url = getElement(is);
+            this.writeMessage(url);
 
-            final String s = nodeValue(root);
-            if(s != null){
-                this.writeMessage(s);
-            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
         } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
             e.printStackTrace();
         }
     }
@@ -80,40 +74,17 @@ public class EnshortLinkFiler extends Filter {
 
     /**
      *
-     * @param root
-     * @return
-     */
-    protected String nodeValue(Element root) {
-        final NodeList response = root.getElementsByTagName("response");
-        final int responseCount = response.getLength();
-        int i = 0;
-        if (responseCount > 0) {
-            do {
-                final Node item = response.item(i);
-                if(item.getNodeName().equals("data")){
-                    final NodeList childNodes = item.getChildNodes();
-                    final Node shortUrl = childNodes.item(1);
-                    return shortUrl.getNodeValue();
-                }
-                ++i;
-            } while (i <= responseCount);
-        }
-        return null;
-    }
-
-    /**
-     *
      * @param is
      * @return
-     * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
      */
-    protected Element getElement(InputStream is) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(is);
-        return document.getDocumentElement();
+    protected String getElement(InputStream is) throws SAXException, IOException, DocumentException {
+        SAXReader reader = new SAXReader();
+        org.dom4j.Document document = reader.read(is);
+        Node node = document.selectSingleNode("//message/response/data/short_url");
+
+        return node.getText();
     }
 
     /**
@@ -122,7 +93,7 @@ public class EnshortLinkFiler extends Filter {
      * @return
      * @throws IOException
      */
-    protected InputStream getInputStream(URL theUrl) throws IOException {
+    protected InputStream getInputStream(URL theUrl) throws IOException, DocumentException {
         HttpURLConnection urlConnection = (HttpURLConnection) theUrl.openConnection();
         urlConnection.setRequestMethod("GET");
         return urlConnection.getInputStream();

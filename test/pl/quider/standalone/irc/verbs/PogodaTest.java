@@ -8,6 +8,8 @@ import pl.quider.standalone.irc.MyBot;
 import pl.quider.standalone.irc.model.Message;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
@@ -28,9 +30,10 @@ public class PogodaTest {
     @Test
     public void testExecute() throws Exception {
         bot = mock(MyBot.class);
-        Pogoda join = spy(new Pogoda(bot, msg));
+        Pogoda pogoda = spy(new Pogoda(bot, msg));
+        doNothing().when(pogoda).sendMessage(any());
 
-        join.execute("Poznań"+MyBot.VERB_PARAM_DELIMITER);
+        pogoda.execute("Poznań"+MyBot.VERB_PARAM_DELIMITER);
     }
 
 }

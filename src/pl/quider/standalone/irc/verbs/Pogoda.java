@@ -102,7 +102,7 @@ public class Pogoda extends Verb {
      *
      * @param message
      */
-    private void sendMessage(String message) {
+    protected void sendMessage(String message) {
         bot.sendMessage(msg.getChannel(), message);
     }
 
