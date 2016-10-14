@@ -67,7 +67,8 @@ public class MessageService {
 
     protected void filter() {
         String message = msg.getMessage();
-        if (message.startsWith("http://") || message.startsWith("https://")) {
+        if ((message.startsWith("http://") || message.startsWith("https://"))&&(message.length()>101)) {
+
             EnshortLinkFiler enshortLinkFiler = new EnshortLinkFiler(msg, mybot);
             enshortLinkFiler.execute();
         }
