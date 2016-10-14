@@ -2,8 +2,10 @@ package pl.quider.standalone.irc;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import pl.quider.standalone.irc.exceptions.NoLoginException;
 import pl.quider.standalone.irc.protocol.IrcException;
 import pl.quider.standalone.irc.protocol.PircBot;
+import pl.quider.standalone.irc.protocol.ReplyConstants;
 import pl.quider.standalone.irc.protocol.User;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
 import pl.quider.standalone.irc.dbsession.MySqlDatabaseSession;
@@ -68,7 +70,7 @@ public class MyBot extends PircBot {
     @Override
     protected void onServerResponse(int code, String response) {
         switch (code) {
-            case 311:
+            case ReplyConstants.RPL_WHOISUSER:
                 if (this.verb != null) {
                     try {
                         this.verb.execute(response);
@@ -124,10 +126,14 @@ public class MyBot extends PircBot {
     @Override
     protected void onJoin(String channel, String sender, String login, String hostname) {
         UserService userService = new UserService(sender, login, hostname, this.session);
-        userService.joined(channel);
-        pl.quider.standalone.irc.model.User user = userService.getUser();
-        if (user.isOp()) {
-            this.op(channel, user.getNickName());
+        try {
+            userService.joined(channel);
+            pl.quider.standalone.irc.model.User user = userService.getUser();
+            if (user.isOp()) {
+                this.op(channel, user.getNickName());
+            }
+        } catch (NoLoginException e) {
+            e.printStackTrace();
         }
     }
 
@@ -159,6 +165,7 @@ public class MyBot extends PircBot {
 
     /**
      * Getter of session object
+     *
      * @return hibernate session
      */
     public Session getSession() {
