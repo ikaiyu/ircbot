@@ -19,6 +19,8 @@ public class ChannelService {
      * Database session.
      */
     private final Session session;
+    public static final String HQL = "from Channel as c where c.user = :user and c.channelName = :channel";
+    public static final String STATS_HQL = "from pl.quider.standalone.irc.model.Channel as c where c.user = :user and channelName = :name";
 
     /**
      * Constructon sets database session.
@@ -37,7 +39,7 @@ public class ChannelService {
             String channel = msg.getChannel();
             Transaction transaction = session.beginTransaction();
         try {
-            Query query = session.createQuery("from pl.quider.standalone.irc.model.Channel as c where c.user = :user and channel = :name");
+            Query query = session.createQuery(STATS_HQL);
             query.setParameter("user", user);
             query.setParameter("name", channel);
             List<Channel> resultList = query.getResultList();
@@ -80,8 +82,7 @@ public class ChannelService {
      */
     public String getStats(String parameter, Message msg) {
         try {
-            String hql = "from Channel as c where c.user = :user and c.channelName = :channel";
-            Query query = session.createQuery(hql);
+            Query query = session.createQuery(HQL);
             query.setParameter("user",msg.getUser());
             query.setParameter("channel", msg.getChannel());
             Channel singleResult = (Channel) query.getSingleResult();

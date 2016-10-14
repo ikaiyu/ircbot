@@ -3,6 +3,7 @@ package pl.quider.standalone.irc.services;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import pl.quider.standalone.irc.exceptions.NoLoginException;
 import pl.quider.standalone.irc.model.User;
 
 import java.util.Date;
@@ -39,7 +40,10 @@ public class UserService {
      * Gets user from database or creates new.
      * @return
      */
-    public User getUser() {
+    public User getUser() throws NoLoginException {
+        if(this.getLogin() == null ||this.getLogin().isEmpty()){
+            throw new NoLoginException();
+        }
         if(!this.userExists()){
             this.createNewUser();
         }
@@ -111,7 +115,7 @@ public class UserService {
      * like set presence
      * @param channel String channel name i.e: #channel
      */
-    public void joined(String channel) {
+    public void joined(String channel) throws NoLoginException {
         User user = this.getUser();
         this.userPresent(user);
     }
@@ -136,7 +140,7 @@ public class UserService {
         }
     }
 
-    public void opUser(){
+    public void opUser() throws NoLoginException {
         Transaction transaction = session.getTransaction();
         if(!transaction.isActive()){
             transaction.begin();
@@ -145,6 +149,12 @@ public class UserService {
         this.user.setOp(true);
         session.save(this.user);
         transaction.commit();
+    }
+
+    public Date seen(String nickName){
+        Query query = session.createQuery("from pl.quider.standalone.irc.model.User as u where u.nick = :nick order by lastSeen desc");
+        query.setParameter("nick", nickName);
+        return null;
     }
 
     public void getStats() {
