@@ -22,7 +22,7 @@ public class Rss extends Verb {
 
     @Override
     public void execute(String parameter) throws Exception {
-        RssService rssResvice = new RssService();
+        RssService rssResvice = new RssService(bot.getSession());
         List<pl.quider.standalone.irc.model.Rss> feeds = rssResvice.getListOfFeeds();
         SyndFeedInput input = new SyndFeedInput();
         for (pl.quider.standalone.irc.model.Rss rss : feeds) {

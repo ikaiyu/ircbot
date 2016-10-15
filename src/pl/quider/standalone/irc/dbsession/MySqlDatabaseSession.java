@@ -8,10 +8,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.internal.SessionFactoryImpl;
-import pl.quider.standalone.irc.model.Channel;
-import pl.quider.standalone.irc.model.ChannelHistory;
-import pl.quider.standalone.irc.model.Message;
-import pl.quider.standalone.irc.model.User;
+import pl.quider.standalone.irc.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -29,6 +26,8 @@ public class MySqlDatabaseSession extends ADatabaseSession {
         configuration.addAnnotatedClass(ChannelHistory.class);
         configuration.addAnnotatedClass(Message.class);
         configuration.addAnnotatedClass(Channel.class);
+        configuration.addAnnotatedClass(Rss.class);
+        configuration.addAnnotatedClass(RssEntry.class);
 
         StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
         SessionFactory sessionFactory = configuration.buildSessionFactory(ssrb.build());
