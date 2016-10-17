@@ -31,7 +31,7 @@ public class UserService {
      */
     public UserService(String sender, String login, String hostname, Session session) {
         this.nick =sender;
-        this.login= login;
+        this.login= login.replace("~","");
         this.host=hostname;
         this.session=session;
     }
