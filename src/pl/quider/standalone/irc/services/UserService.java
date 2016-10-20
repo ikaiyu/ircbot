@@ -31,8 +31,10 @@ public class UserService {
      */
     public UserService(String sender, String login, String hostname, Session session) {
         this.nick =sender;
-        this.login= login.replace("~","");
-        this.host=hostname;
+        if( login != null)
+            this.login= login.replace("~","");
+        if(hostname != null)
+            this.host=hostname;
         this.session=session;
     }
 

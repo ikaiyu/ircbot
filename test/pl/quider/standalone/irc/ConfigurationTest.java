@@ -24,7 +24,7 @@ public class ConfigurationTest {
     @Before
     public void init(){
         MockitoAnnotations.initMocks(this);
-        config = spy(new Configuration());
+        config = spy(Configuration.getInstance());
     }
 
     @Test

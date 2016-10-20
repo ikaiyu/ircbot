@@ -28,6 +28,7 @@ import java.util.List;
 public class MyBot extends PircBot {
 
     public static final String VERB_PARAM_DELIMITER = "&%%&";
+
     boolean isOp;
     private Session session;
     private Verb verb;
@@ -52,7 +53,8 @@ public class MyBot extends PircBot {
     @Override
     protected void onDisconnect() {
         try {
-            this.connect("open.ircnet.net");
+            Configuration instance = Configuration.getInstance();
+            this.connect(instance.getValue(ConfigurationKeysContants.SERVER1));
             ChannelService channelService = new ChannelService(session);
             List list = channelService.joinChannels();
             list.forEach(item -> {
