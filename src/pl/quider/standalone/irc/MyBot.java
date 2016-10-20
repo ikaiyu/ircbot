@@ -14,6 +14,7 @@ import pl.quider.standalone.irc.services.ChannelService;
 import pl.quider.standalone.irc.services.MessageService;
 import pl.quider.standalone.irc.services.UserService;
 import pl.quider.standalone.irc.verbs.Op;
+import pl.quider.standalone.irc.verbs.Rss;
 import pl.quider.standalone.irc.verbs.Verb;
 
 import java.io.IOException;
@@ -21,6 +22,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Adrian on 27.09.2016.
@@ -32,12 +35,23 @@ public class MyBot extends PircBot {
     boolean isOp;
     private Session session;
     private Verb verb;
+    private Timer timer;
 
 
     public MyBot(ADatabaseSession session) {
         super();
         this.session = session.getSession();
-
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    Rss rss = new Rss(MyBot.this, null);
+                    rss.execute(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 60000);
     }
 
     @Override

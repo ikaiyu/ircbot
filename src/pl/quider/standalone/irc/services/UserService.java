@@ -82,6 +82,7 @@ public class UserService {
      */
     public boolean userExists() {
         Query query = session.createQuery(QUERY);
+        //TODO: check by nick instead of host
         query.setParameter("host", getHost());
         query.setParameter("login", getLogin());
         List<User> resultList = query.getResultList();

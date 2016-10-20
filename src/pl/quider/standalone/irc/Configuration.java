@@ -42,7 +42,7 @@ public class Configuration {
     }
 
     /**
-     * TODO
+     *
      * @param pathToConfigFile
      * @return
      */

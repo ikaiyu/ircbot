@@ -22,6 +22,7 @@ public class Rss extends Verb {
 
     @Override
     public void execute(String parameter) throws Exception {
+        //TODO: check if parameters are null and run all links
         RssService rssResvice = new RssService(bot.getSession());
         List<pl.quider.standalone.irc.model.Rss> feeds = rssResvice.getListOfFeeds();
         SyndFeedInput input = new SyndFeedInput();
