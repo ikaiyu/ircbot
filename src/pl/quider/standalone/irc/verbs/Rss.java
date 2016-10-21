@@ -26,6 +26,7 @@ public class Rss extends Verb {
         RssService rssResvice = new RssService(bot.getSession());
         List<pl.quider.standalone.irc.model.Rss> feeds = rssResvice.getListOfFeeds();
         SyndFeedInput input = new SyndFeedInput();
+        //TODO: streamloop of channels we are in and stream all feeds. Multithreading?
         for (pl.quider.standalone.irc.model.Rss rss : feeds) {
             SyndFeed feed = input.build(new XmlReader(new URL(rss.getUri())));
             for (Object syndEntry : feed.getEntries()) {
