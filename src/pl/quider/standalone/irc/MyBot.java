@@ -42,17 +42,20 @@ public class MyBot extends PircBot {
         super();
         this.session = session.getSession();
         timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    Rss rss = new Rss(MyBot.this, null);
-                    rss.execute(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        Configuration instance = Configuration.getInstance();
+        if(instance.getValue(ConfigurationKeysContants.RSS_ENABLED).equals("1")) {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        Rss rss = new Rss(MyBot.this, null);
+                        rss.execute(null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        },120000);
+            }, 120000);
+        }
     }
 
     @Override

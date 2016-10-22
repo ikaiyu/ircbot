@@ -9,4 +9,5 @@ public class ConfigurationKeysContants {
     public static final String ALT_NICK = "alt_nick";
     public static final String LOGIN = "login";
     public static final String JOIN_CHANNEL = "join_channel";
+    public static final String RSS_ENABLED = "rss_enabled";
 }

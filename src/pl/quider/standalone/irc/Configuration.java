@@ -71,7 +71,7 @@ public class Configuration {
         properties.put(ConfigurationKeysContants.ALT_NICK,"_Adirael_");
         properties.put(ConfigurationKeysContants.LOGIN,"Adirael");
         properties.put(ConfigurationKeysContants.JOIN_CHANNEL,"#adirael_chan");
-//        properties.put("","");
+        properties.put(ConfigurationKeysContants.RSS_ENABLED,"1");
 //        properties.put("","");
 //        properties.put("","");
 //        properties.put("","");
