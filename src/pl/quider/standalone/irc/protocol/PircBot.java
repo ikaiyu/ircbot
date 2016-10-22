@@ -2886,7 +2886,7 @@ public abstract class PircBot implements ReplyConstants {
      * @return A String array containing the names of all channels that we
      *         are in.
      */
-    public final String[] getChannels() {
+    public String[] getChannels() {
         String[] channels = new String[0];
         synchronized (_channels) {
             channels = new String[_channels.size()];

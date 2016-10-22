@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by Adrian on 15.10.2016.
  */
 @Entity
-@Table(name = "bot_rss_entry")
+@Table(name = "bot_rss_entries")
 public class RssEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

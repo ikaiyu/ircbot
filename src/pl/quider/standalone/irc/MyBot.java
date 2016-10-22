@@ -51,7 +51,7 @@ public class MyBot extends PircBot {
                     e.printStackTrace();
                 }
             }
-        }, 60000);
+        },120000);
     }
 
     @Override
