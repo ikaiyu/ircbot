@@ -41,6 +41,7 @@ public class MyBot extends PircBot {
     public MyBot(ADatabaseSession session) {
         super();
         this.session = session.getSession();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
