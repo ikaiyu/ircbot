@@ -1,5 +1,7 @@
 package pl.quider.standalone.irc.services;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -13,7 +15,7 @@ import java.util.List;
  * Created by Adrian on 29.09.2016.
  */
 public class UserService {
-
+    private static final Logger LOG = LogManager.getLogger("UserService");
     private static String QUERY = "from pl.quider.standalone.irc.model.User as u where u.mask = :host and u.login = :login";
 
     private String nick;
@@ -24,29 +26,31 @@ public class UserService {
 
     /**
      * Creates new object of class.
+     *
      * @param sender
      * @param login
      * @param hostname
      * @param session
      */
     public UserService(String sender, String login, String hostname, Session session) {
-        this.nick =sender;
-        if( login != null)
-            this.login= login.replace("~","");
-        if(hostname != null)
-            this.host=hostname;
-        this.session=session;
+        this.nick = sender;
+        if (login != null)
+            this.login = login.replace("~", "");
+        if (hostname != null)
+            this.host = hostname;
+        this.session = session;
     }
 
-     /**
+    /**
      * Gets user from database or creates new.
+     *
      * @return
      */
     public User getUser() throws NoLoginException {
-        if(this.getLogin() == null ||this.getLogin().isEmpty()){
+        if (this.getLogin() == null || this.getLogin().isEmpty()) {
             throw new NoLoginException();
         }
-        if(!this.userExists()){
+        if (!this.userExists()) {
             this.createNewUser();
         }
         return this.fetchUser();
@@ -66,7 +70,7 @@ public class UserService {
             user.setLogin(getLogin());
             user.setMask(getHost());
             Transaction transaction = session.getTransaction();
-            if(transaction == null || !transaction.isActive())
+            if (transaction == null || !transaction.isActive())
                 transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
@@ -78,6 +82,7 @@ public class UserService {
 
     /**
      * Checks if user exists in database.
+     *
      * @return user object if exists. Otherwise null.
      */
     public boolean userExists() {
@@ -86,10 +91,10 @@ public class UserService {
         query.setParameter("host", getHost());
         query.setParameter("login", getLogin());
         List<User> resultList = query.getResultList();
-        if(resultList.size()>0) {
+        if (resultList.size() > 0) {
             this.user = resultList.get(0);
         }
-        return user!=null;
+        return user != null;
     }
 
     /**
@@ -116,6 +121,7 @@ public class UserService {
     /**
      * Actions which supposed to be performed when someone joins to channel
      * like set presence
+     *
      * @param channel String channel name i.e: #channel
      */
     public void joined(String channel) throws NoLoginException {
@@ -124,14 +130,15 @@ public class UserService {
     }
 
     /**
-     * Sets latest presence of user 
+     * Sets latest presence of user
+     *
      * @param user
      */
     public void userPresent(User user) {
         try {
 
             Transaction transaction = session.getTransaction();
-            if(transaction== null || !transaction.isActive()){
+            if (transaction == null || !transaction.isActive()) {
                 transaction = session.beginTransaction();
             }
             user.setLastSeen(new Date());
@@ -145,7 +152,7 @@ public class UserService {
 
     public void opUser() throws NoLoginException {
         Transaction transaction = session.getTransaction();
-        if(!transaction.isActive()){
+        if (!transaction.isActive()) {
             transaction.begin();
         }
         getUser();
@@ -154,10 +161,23 @@ public class UserService {
         transaction.commit();
     }
 
-    public Date seen(String nickName){
-        Query query = session.createQuery("from pl.quider.standalone.irc.model.User as u where u.nick = :nick order by lastSeen desc");
-        query.setParameter("nick", nickName);
-        return null;
+    /**
+     * Checks in database when the passed nick was seen last time on channel
+     * and returns the date of last seen.
+     * @param nickName nick to check
+     * @return date when nick was seen whenever or null when it wasn't
+     */
+    public Date seen(String nickName) {
+        try {
+            User singleResult = null;
+            Query<User> query = session.createQuery("from pl.quider.standalone.irc.model.User as u where u.nick = :nick order by lastSeen desc", User.class);
+            query.setParameter("nick", nickName).setMaxResults(1);
+            singleResult = query.getSingleResult();
+            return singleResult.getLastSeen();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return null;
+        }
     }
 
     public void getStats() {

@@ -1,5 +1,7 @@
 package pl.quider.standalone.irc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import pl.quider.standalone.irc.exceptions.NoLoginException;
@@ -29,7 +31,7 @@ import java.util.TimerTask;
  * Created by Adrian on 27.09.2016.
  */
 public class MyBot extends PircBot {
-
+    private static final Logger LOG = LogManager.getLogger("Mybot");
     public static final String VERB_PARAM_DELIMITER = "&%%&";
 
     boolean isOp;
@@ -44,6 +46,7 @@ public class MyBot extends PircBot {
         timer = new Timer();
         Configuration instance = Configuration.getInstance();
         if(instance.getValue(ConfigurationKeysContants.RSS_ENABLED).equals("1")) {
+            LOG.debug("Config: "+ConfigurationKeysContants.RSS_ENABLED+"="+instance.getValue(ConfigurationKeysContants.RSS_ENABLED));
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -51,7 +54,7 @@ public class MyBot extends PircBot {
                         Rss rss = new Rss(MyBot.this, null);
                         rss.execute(null);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOG.error(e.getMessage(), e);
                     }
                 }
             }, 120000);
@@ -76,26 +79,25 @@ public class MyBot extends PircBot {
             ChannelService channelService = new ChannelService(session);
             List list = channelService.joinChannels();
             list.forEach(item -> {
+                LOG.info("Try to join channel "+item);
                 this.joinChannel((String) item);
             });
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IrcException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error(e.getMessage(), e);
         }
     }
 
     @Override
     protected void onServerResponse(int code, String response) {
+        LOG.debug("server responsed: "+code+ " "+ response);
         switch (code) {
             case ReplyConstants.RPL_WHOISUSER:
+                LOG.debug("verb:" +this.verb.getClass().getName());
                 if (this.verb != null) {
                     try {
                         this.verb.execute(response);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOG.error(e.getMessage(), e);
                     }
                     this.verb = null;
                 }
@@ -127,18 +129,8 @@ public class MyBot extends PircBot {
             ChannelService channelService = new ChannelService(this.session);
             channelService.updateStats(user, msg);
 
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error(e.getMessage(), e);
         }
 
     }
@@ -153,7 +145,7 @@ public class MyBot extends PircBot {
                 this.op(channel, user.getNickName());
             }
         } catch (NoLoginException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
     }
 
