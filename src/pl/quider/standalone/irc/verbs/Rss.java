@@ -12,6 +12,7 @@ import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.services.RssService;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -44,8 +45,9 @@ public class Rss extends Verb {
             RssService rssResvice = createServiceObject();
             List<pl.quider.standalone.irc.model.Rss> feeds = rssResvice.getListOfFeeds();
             for (pl.quider.standalone.irc.model.Rss rss : feeds) {
+                HttpURLConnection httpcon = (HttpURLConnection)new URL(rss.getUri()).openConnection();
                 SyndFeed feed = null;
-                feed = input.build(new XmlReader(new URL(rss.getUri())));
+                feed = input.build(new XmlReader(httpcon));
                 for (Object syndEntry : feed.getEntries()) {
                     SyndEntryImpl entry = (SyndEntryImpl) syndEntry;
                     if(rssResvice.saveEntry(entry.getTitle(),entry.getUri(),rss)) {
