@@ -40,10 +40,9 @@ public class RssTest {
         String[] listChannel = new String[]{"#chan1", "#chan2"};
         doReturn(listChannel).when(bot).getChannels();
         RssService rssService = mock(RssService.class);
-        when(rssService.getListOfFeeds()).thenReturn(prepareListOfFeeds());
+        doReturn(prepareListOfFeeds()).when(rssService).getListOfFeeds();
 
         Rss rss = spy(new Rss(bot, null));
-
         doReturn(session).when(rss).createServiceObject();
 
         doNothing().when(rss).sendMessage(any(), any());
