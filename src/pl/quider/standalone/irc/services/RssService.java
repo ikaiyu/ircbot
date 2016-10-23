@@ -32,11 +32,12 @@ public class RssService {
     }
 
     /**
+     * Saves entry to database
      * @param title
      * @param uri
      * @param rssParent
      */
-    public void saveEntry(String title, String uri, Rss rssParent) {
+    public boolean saveEntry(String title, String uri, Rss rssParent) {
         Transaction transaction = session.beginTransaction();
         Query<RssEntry> query = session.createQuery(SELECT_RSS_BY_URI, RssEntry.class);
         query.setParameter("link", uri);
@@ -49,8 +50,9 @@ public class RssService {
             rss.setRss(rssParent);
             session.save(rss);
             transaction.commit();
+            return true;
         }
-
-        //otherwise do nothing
+        transaction.rollback();
+        return  false;
     }
 }

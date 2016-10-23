@@ -5,12 +5,13 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pl.quider.standalone.irc.MyBot;
 import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.services.RssService;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.List;
  * Created by Adrian on 14.10.2016.
  */
 public class Rss extends Verb {
+
+    private static final Logger LOG = LogManager.getLogger("RssVerb");
 
     public Rss(MyBot mybot, Message msg) {
         super(mybot, msg);
@@ -31,6 +34,10 @@ public class Rss extends Verb {
         }
     }
 
+    /**
+     *
+     * @param channel
+     */
     private void sentToChannels(String channel) {
         try {
             SyndFeedInput input = new SyndFeedInput();
@@ -41,17 +48,22 @@ public class Rss extends Verb {
                 feed = input.build(new XmlReader(new URL(rss.getUri())));
                 for (Object syndEntry : feed.getEntries()) {
                     SyndEntryImpl entry = (SyndEntryImpl) syndEntry;
-                    rssResvice.saveEntry(entry.getTitle(),entry.getUri(),rss);
-                    this.sendMessage(channel, entry.getUri());
+                    if(rssResvice.saveEntry(entry.getTitle(),entry.getUri(),rss)) {
+                        this.sendMessage(channel, entry.getUri());
+                    }
                 }
             }
         } catch (FeedException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
     }
 
+    /**
+     *
+     * @return
+     */
     protected RssService createServiceObject(){
         RssService rssResvice = new RssService(bot.getSession());
         return  rssResvice;

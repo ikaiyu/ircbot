@@ -3,15 +3,12 @@ package pl.quider.standalone.irc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import pl.quider.standalone.irc.dbsession.ADatabaseSession;
 import pl.quider.standalone.irc.exceptions.NoLoginException;
-import pl.quider.standalone.irc.protocol.IrcException;
+import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.protocol.PircBot;
 import pl.quider.standalone.irc.protocol.ReplyConstants;
 import pl.quider.standalone.irc.protocol.User;
-import pl.quider.standalone.irc.dbsession.ADatabaseSession;
-import pl.quider.standalone.irc.dbsession.MySqlDatabaseSession;
-import pl.quider.standalone.irc.model.Message;
 import pl.quider.standalone.irc.services.ChannelService;
 import pl.quider.standalone.irc.services.MessageService;
 import pl.quider.standalone.irc.services.UserService;
@@ -19,10 +16,6 @@ import pl.quider.standalone.irc.verbs.Op;
 import pl.quider.standalone.irc.verbs.Rss;
 import pl.quider.standalone.irc.verbs.Verb;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -42,9 +35,10 @@ public class MyBot extends PircBot {
 
     public MyBot(ADatabaseSession session) {
         super();
+        Configuration instance = Configuration.getInstance();
+        this.setProperties(instance);
         this.session = session.getSession();
         timer = new Timer();
-        Configuration instance = Configuration.getInstance();
         if(instance.getValue(ConfigurationKeysContants.RSS_ENABLED).equals("1")) {
             LOG.debug("Config: "+ConfigurationKeysContants.RSS_ENABLED+"="+instance.getValue(ConfigurationKeysContants.RSS_ENABLED));
             timer.schedule(new TimerTask() {
@@ -57,8 +51,14 @@ public class MyBot extends PircBot {
                         LOG.error(e.getMessage(), e);
                     }
                 }
-            }, 120000);
+            }, 120000,120000);
         }
+    }
+
+    protected void setProperties(Configuration instance) {
+        this.setName(instance.getValue(ConfigurationKeysContants.LOGIN));
+        this.setNick(instance.getValue(ConfigurationKeysContants.NICK));
+        this.setLogin(instance.getValue(ConfigurationKeysContants.LOGIN));
     }
 
     @Override

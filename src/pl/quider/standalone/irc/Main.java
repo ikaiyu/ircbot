@@ -1,5 +1,7 @@
 package pl.quider.standalone.irc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pl.quider.standalone.irc.exceptions.NotConfiguredException;
 import pl.quider.standalone.irc.protocol.NickAlreadyInUseException;
 import pl.quider.standalone.irc.dbsession.ADatabaseSession;
@@ -12,6 +14,7 @@ import java.io.IOException;
  * Created by Adrian on 27.09.2016.
  */
 public class Main {
+    private static final Logger LOG = LogManager.getLogger("Main");
 
     public static void main(String[] args) throws Exception {
         //before we run database connection and other parts
@@ -28,7 +31,7 @@ public class Main {
             }
         } catch (NotConfiguredException e) {
             //end application because it is not configured.
-
+            LOG.error(e.getMessage(), e);
             return;
         }
 
@@ -39,10 +42,10 @@ public class Main {
         try {
             bot.connect(configuration.getValue(ConfigurationKeysContants.SERVER1));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } catch (NickAlreadyInUseException e) {
             bot.changeNick(configuration.getValue(ConfigurationKeysContants.ALT_NICK));
-
+            LOG.error(e.getMessage(), e);
         }
         //join service channel
         bot.joinChannel(configuration.getValue(ConfigurationKeysContants.JOIN_CHANNEL));
